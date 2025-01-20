@@ -6,56 +6,65 @@ import java.util.List;
 
 public class Wallet implements Serializable {
     private static final long serialVersionUID = 1L;
-    private List<Category> categories;
 
-    public Wallet() {
-        this.categories = new ArrayList<>();
-    }
+    private List<Category> categories = new ArrayList<>();
+    private double totalIncome = 0;
+    private double totalExpenses = 0;
 
+    // Получить список всех категорий
     public List<Category> getCategories() {
         return categories;
     }
 
-    public Category getCategoryByName(String name) {
-        for (Category category : categories) {
-            if (category.getName().equalsIgnoreCase(name)) {
-                return category;
-            }
-        }
-        return null;
-    }
-
+    // Добавить категорию
     public void addCategory(Category category) {
         categories.add(category);
     }
 
-    public void addTransaction(Transaction transaction) {
-        Category category = getCategoryByName(transaction.getCategory());
+    // Найти категорию по имени
+    public Category getCategoryByName(String categoryName) {
+        for (Category category : categories) {
+            if (category.getName().equals(categoryName)) {
+                return category;
+            }
+        }
+        return null;  // Если категория не найдена
+    }
+
+    // Добавить доход
+    public void addIncome(double amount, String categoryName) {
+        Category category = getCategoryByName(categoryName);
         if (category == null) {
-            category = new Category(transaction.getCategory(), 0);
+            category = new Category(categoryName, 0);
             addCategory(category);
         }
+        category.addIncome(amount);
+        totalIncome += amount;  // Обновляем общий доход
+    }
 
-        if (transaction.getType() == TransactionType.INCOME) {
-            category.addIncome(transaction.getAmount());
-        } else if (transaction.getType() == TransactionType.EXPENSE) {
-            category.addExpense(transaction.getAmount());
+    // Добавить расход
+    public void addExpense(double amount, String categoryName) {
+        Category category = getCategoryByName(categoryName);
+        if (category == null) {
+            category = new Category(categoryName, 0);
+            addCategory(category);
         }
+        category.addExpense(amount);
+        totalExpenses += amount;  // Обновляем общий расход
     }
 
-    // Получение общего дохода
+    // Получить общий доход
     public double getTotalIncome() {
-        return categories.stream().mapToDouble(Category::getIncome).sum();
+        return totalIncome;
     }
 
-    // Получение общих расходов
+    // Получить общий расход
     public double getTotalExpenses() {
-        return categories.stream().mapToDouble(Category::getExpenses).sum();
+        return totalExpenses;
     }
 
-    // Получение баланса (доход - расход)
+    // Получить общий баланс (доход - расход)
     public double getBalance() {
-        // Баланс: общий доход - общий расход
-        return getTotalIncome() - getTotalExpenses();
+        return totalIncome - totalExpenses;
     }
 }

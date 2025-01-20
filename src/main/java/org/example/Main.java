@@ -65,7 +65,7 @@ public class Main {
             System.out.println("6. Расход по категориям");
             System.out.println("7. Бюджет по категориям");
             System.out.println("8. Внести бюджет");
-            System.out.println("9. Посмотреть баланс"); // Новый пункт меню для баланса
+            System.out.println("9. Баланс");
             System.out.println("10. Выйти");
 
             int choice = scanner.nextInt();
@@ -110,26 +110,24 @@ public class Main {
 
     private static void addIncome(Scanner scanner, User currentUser) {
         System.out.print("Введите категорию дохода: ");
-        String incomeCategory = scanner.nextLine();
-
+        String category = scanner.nextLine();
         System.out.print("Введите сумму дохода: ");
-        double incomeAmount = scanner.nextDouble();
-        scanner.nextLine();  // Читаем символ новой строки
+        double amount = scanner.nextDouble();
+        scanner.nextLine(); // Считывание символа новой строки
 
-        currentUser.getWallet().addTransaction(new Transaction(incomeAmount, incomeCategory, TransactionType.INCOME));
-        System.out.println("Доход добавлен в категорию '" + incomeCategory + "'.");
+        currentUser.getWallet().addIncome(amount, category);
+        System.out.println("Доход добавлен в категорию '" + category + "'.");
     }
 
     private static void addExpense(Scanner scanner, User currentUser) {
         System.out.print("Введите категорию расхода: ");
-        String expenseCategory = scanner.nextLine();
-
+        String category = scanner.nextLine();
         System.out.print("Введите сумму расхода: ");
-        double expenseAmount = scanner.nextDouble();
-        scanner.nextLine();  // Читаем символ новой строки
+        double amount = scanner.nextDouble();
+        scanner.nextLine(); // Считывание символа новой строки
 
-        currentUser.getWallet().addTransaction(new Transaction(expenseAmount, expenseCategory, TransactionType.EXPENSE));
-        System.out.println("Расход добавлен в категорию '" + expenseCategory + "'.");
+        currentUser.getWallet().addExpense(amount, category);
+        System.out.println("Расход добавлен в категорию '" + category + "'.");
     }
 
     private static void addBudget(Scanner scanner, User currentUser) {
@@ -145,7 +143,7 @@ public class Main {
             currentUser.getWallet().addCategory(category);
             System.out.println("Категория '" + categoryName + "' добавлена с бюджетом " + budget + ".");
         } else {
-            category.addExpense(-category.getBudget() + budget); // Перезапись бюджета
+            category.setBudget(budget);
             System.out.println("Бюджет для категории '" + categoryName + "' обновлен.");
         }
     }
@@ -167,8 +165,9 @@ public class Main {
     private static void displayBudgetsByCategory(User currentUser) {
         System.out.println("\nБюджет по категориям:");
         for (Category category : currentUser.getWallet().getCategories()) {
+            double remainingBudget = category.getRemainingBudget();  // Получаем оставшийся бюджет
             System.out.printf("Категория: %s, Бюджет: %.2f, Оставшийся бюджет: %.2f%n",
-                    category.getName(), category.getBudget(), category.getRemainingBudget());
+                    category.getName(), category.getBudget(), remainingBudget);
         }
     }
 }
